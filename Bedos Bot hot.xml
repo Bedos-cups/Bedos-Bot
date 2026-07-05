@@ -1,0 +1,247 @@
+<xml xmlns="http://www.w3.org/1999/xhtml">
+  <variables>
+    <variable type="" id="init_stake">Mise_Initiale</variable>
+    <variable type="" id="curr_stake">Mise_Actuelle</variable>
+    <variable type="" id="multiplier">Multiplicateur_Martingale</variable>
+    <variable type="" id="max_martingale">Max_Rebonds</variable>
+    <variable type="" id="step">Etape_Actuelle</variable>
+  </variables>
+  <block type="variables_set" id="set_init_stake" x="20" y="20">
+    <field name="VAR" id="init_stake" variabletype="">Mise_Initiale</field>
+    <value name="VALUE">
+      <block type="math_number"><field name="NUM">1</field></block>
+    </value>
+    <next>
+      <block type="variables_set" id="set_curr_stake">
+        <field name="VAR" id="curr_stake" variabletype="">Mise_Actuelle</field>
+        <value name="VALUE">
+          <block type="variables_get">
+            <field name="VAR" id="init_stake" variabletype="">Mise_Initiale</field>
+          </block>
+        </value>
+        <next>
+          <block type="variables_set" id="set_multiplier">
+            <field name="VAR" id="multiplier" variabletype="">Multiplicateur_Martingale</field>
+            <value name="VALUE">
+              <block type="math_number"><field name="NUM">2.2</field></block>
+            </value>
+            <next>
+              <block type="variables_set" id="set_max_martingale">
+                <field name="VAR" id="max_martingale" variabletype="">Max_Rebonds</field>
+                <value name="VALUE">
+                  <block type="math_number"><field name="NUM">4</field></block>
+                </value>
+                <next>
+                  <block type="variables_set" id="set_step">
+                    <field name="VAR" id="step" variabletype="">Etape_Actuelle</field>
+                    <value name="VALUE">
+                      <block type="math_number"><field name="NUM">1</field></block>
+                    </value>
+                    <next>
+                      <block type="trade" id="main_trade_block">
+                        <field name="MARKET_LIST">volidx</field>
+                        <field name="SUBMARKET_LIST">random_index</field>
+                        <field name="SYMBOL_LIST">R_100</field>
+                        <field name="TRADETYPECAT_LIST">callput</field>
+                        <field name="TRADETYPE_LIST">risefall</field>
+                        <field name="PAYOUTTYPE_LIST">stake</field>
+                        <field name="CURRENCY_LIST">USD</field>
+                        <field name="RESTARTONERROR">true</field>
+                        <value name="DURATION">
+                          <block type="math_number"><field name="NUM">5</field></block>
+                        </value>
+                        <value name="AMOUNT">
+                          <block type="variables_get">
+                            <field name="VAR" id="curr_stake" variabletype="">Mise_Actuelle</field>
+                          </block>
+                        </value>
+                        <statement name="PURCHASE">
+                          <block type="controls_if" id="rsi_call_condition">
+                            <value name="IF0">
+                              <block type="logic_compare">
+                                <field name="OP">LT</field>
+                                <value name="A">
+                                  <block type="rsi">
+                                    <field name="INPUT">candles</field>
+                                    <field name="PERIOD">14</field>
+                                  </block>
+                                </value>
+                                <value name="B">
+                                  <block type="math_number"><field name="NUM">30</field></block>
+                                </value>
+                              </block>
+                            </value>
+                            <statement name="DO0">
+                              <block type="purchase" id="purchase_call">
+                                <field name="PURCHASE_LIST">CALL</field>
+                                <comment pinned="false" h="80" w="300">CONFIRMATION API EXTERNE : Avant ce bloc d'achat, vous pouvez insérer un bloc "http_request" pour vérifier une macro (ex: tendance Forex). Si l'API externe confirme un bullish, utilisez ce bloc purchase CALL.</comment>
+                              </block>
+                            </statement>
+                            <next>
+                              <block type="controls_if" id="rsi_put_condition">
+                                <value name="IF0">
+                                  <block type="logic_compare">
+                                    <field name="OP">GT</field>
+                                    <value name="A">
+                                      <block type="rsi">
+                                        <field name="INPUT">candles</field>
+                                        <field name="PERIOD">14</field>
+                                      </block>
+                                    </value>
+                                    <value name="B">
+                                      <block type="math_number"><field name="NUM">70</field></block>
+                                    </value>
+                                  </block>
+                                </value>
+                                <statement name="DO0">
+                                  <block type="purchase" id="purchase_put">
+                                    <field name="PURCHASE_LIST">PUT</field>
+                                  </block>
+                                </statement>
+                              </block>
+                            </next>
+                          </block>
+                        </statement>
+                        <statement name="AFTER_PURCHASE">
+                          <block type="controls_if" id="check_result_if">
+                            <value name="IF0">
+                              <block type="logic_compare">
+                                <field name="OP">EQ</field>
+                                <value name="A">
+                                  <block type="contract_check_result">
+                                    <field name="CHECK_RESULT">win</field>
+                                  </block>
+                                </value>
+                                <value name="B">
+                                  <block type="logic_boolean"><field name="BOOL">TRUE</field></block>
+                                </value>
+                              </block>
+                            </value>
+                            <statement name="DO0">
+                              <block type="variables_set" id="win_reset_stake">
+                                <field name="VAR" id="curr_stake" variabletype="">Mise_Actuelle</field>
+                                <value name="VALUE">
+                                  <block type="variables_get">
+                                    <field name="VAR" id="init_stake" variabletype="">Mise_Initiale</field>
+                                  </block>
+                                </value>
+                                <next>
+                                  <block type="variables_set" id="win_reset_step">
+                                    <field name="VAR" id="step" variabletype="">Etape_Actuelle</field>
+                                    <value name="VALUE">
+                                      <block type="math_number"><field name="NUM">1</field></block>
+                                    </value>
+                                    <next>
+                                      <block type="tradeAgain" id="trade_again_win"></block>
+                                    </next>
+                                  </block>
+                                </next>
+                              </block>
+                            </statement>
+                            <next>
+                              <block type="controls_if" id="check_loss_if">
+                                <value name="IF0">
+                                  <block type="logic_compare">
+                                    <field name="OP">EQ</field>
+                                    <value name="A">
+                                      <block type="contract_check_result">
+                                        <field name="CHECK_RESULT">loss</field>
+                                      </block>
+                                    </value>
+                                    <value name="B">
+                                      <block type="logic_boolean"><field name="BOOL">TRUE</field></block>
+                                    </value>
+                                  </block>
+                                </value>
+                                <statement name="DO0">
+                                  <block type="controls_if" id="check_max_step_if">
+                                    <value name="IF0">
+                                      <block type="logic_compare">
+                                        <field name="OP">LTE</field>
+                                        <value name="A">
+                                          <block type="variables_get">
+                                            <field name="VAR" id="step" variabletype="">Etape_Actuelle</field>
+                                          </block>
+                                        </value>
+                                        <value name="B">
+                                          <block type="variables_get">
+                                            <field name="VAR" id="max_martingale" variabletype="">Max_Rebonds</field>
+                                          </block>
+                                        </value>
+                                      </block>
+                                    </value>
+                                    <statement name="DO0">
+                                      <block type="variables_set" id="loss_martingale_stake">
+                                        <field name="VAR" id="curr_stake" variabletype="">Mise_Actuelle</field>
+                                        <value name="VALUE">
+                                          <block type="math_round">
+                                            <field name="OP">ROUND</field>
+                                            <value name="DIM">
+                                              <block type="math_arithmetic">
+                                                <field name="OP">MULTIPLY</field>
+                                                <value name="A">
+                                                  <block type="variables_get">
+                                                    <field name="VAR" id="curr_stake" variabletype="">Mise_Actuelle</field>
+                                                  </block>
+                                                </value>
+                                                <value name="B">
+                                                  <block type="variables_get">
+                                                    <field name="VAR" id="multiplier" variabletype="">Multiplicateur_Martingale</field>
+                                                  </block>
+                                                </value>
+                                              </block>
+                                            </value>
+                                          </block>
+                                        </value>
+                                        <next>
+                                          <block type="math_change" id="loss_increase_step">
+                                            <field name="VAR" id="step" variabletype="">Etape_Actuelle</field>
+                                            <value name="DELTA">
+                                              <block type="math_number"><field name="NUM">1</field></block>
+                                            </value>
+                                            <next>
+                                              <block type="tradeAgain" id="trade_again_loss"></block>
+                                            </next>
+                                          </block>
+                                        </next>
+                                      </block>
+                                    </statement>
+                                    <statement name="ELSE">
+                                      <block type="variables_set" id="max_loss_reset_stake">
+                                        <field name="VAR" id="curr_stake" variabletype="">Mise_Actuelle</field>
+                                        <value name="VALUE">
+                                          <block type="variables_get">
+                                            <field name="VAR" id="init_stake" variabletype="">Mise_Initiale</field>
+                                          </block>
+                                        </value>
+                                        <next>
+                                          <block type="variables_set" id="max_loss_reset_step">
+                                            <field name="VAR" id="step" variabletype="">Etape_Actuelle</field>
+                                            <value name="VALUE">
+                                              <block type="math_number"><field name="NUM">1</field></block>
+                                            </value>
+                                            <next>
+                                              <block type="tradeAgain" id="trade_again_max_loss"></block>
+                                            </next>
+                                          </block>
+                                        </next>
+                                      </block>
+                                    </statement>
+                                  </block>
+                                </statement>
+                              </block>
+                            </next>
+                          </block>
+                        </statement>
+                      </block>
+                    </next>
+                  </block>
+                </next>
+              </block>
+            </next>
+          </block>
+        </next>
+      </block>
+    </next>
+  </block>
+</xml>
