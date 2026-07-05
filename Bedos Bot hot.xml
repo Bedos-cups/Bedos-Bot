@@ -47,6 +47,9 @@
                         <field name="PAYOUTTYPE_LIST">stake</field>
                         <field name="CURRENCY_LIST">USD</field>
                         <field name="RESTARTONERROR">true</field>
+                        <field name="DURATION">5</field>
+                        <field name="DURATION_TYPE_LIST">t</field>
+                        <field name="AMOUNT">1</field>
                         <value name="DURATION">
                           <block type="math_number"><field name="NUM">5</field></block>
                         </value>
@@ -57,6 +60,7 @@
                         </value>
                         <statement name="PURCHASE">
                           <block type="controls_if" id="rsi_call_condition">
+                            <mutation elseif="0" else="0"></mutation>
                             <value name="IF0">
                               <block type="logic_compare">
                                 <field name="OP">LT</field>
@@ -74,11 +78,11 @@
                             <statement name="DO0">
                               <block type="purchase" id="purchase_call">
                                 <field name="PURCHASE_LIST">CALL</field>
-                                <comment pinned="false" h="80" w="300">CONFIRMATION API EXTERNE : Avant ce bloc d'achat, vous pouvez insérer un bloc "http_request" pour vérifier une macro (ex: tendance Forex). Si l'API externe confirme un bullish, utilisez ce bloc purchase CALL.</comment>
                               </block>
                             </statement>
                             <next>
                               <block type="controls_if" id="rsi_put_condition">
+                                <mutation elseif="0" else="0"></mutation>
                                 <value name="IF0">
                                   <block type="logic_compare">
                                     <field name="OP">GT</field>
