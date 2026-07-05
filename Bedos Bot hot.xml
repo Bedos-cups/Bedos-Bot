@@ -39,7 +39,7 @@
                     </value>
                     <next>
                       <block type="trade" id="main_trade_block">
-                        <field name="MARKET_LIST">volidx</field>
+                        <field name="MARKET_LIST">synthetic_index</field>
                         <field name="SUBMARKET_LIST">random_index</field>
                         <field name="SYMBOL_LIST">R_100</field>
                         <field name="TRADETYPECAT_LIST">callput</field>
@@ -47,9 +47,6 @@
                         <field name="PAYOUTTYPE_LIST">stake</field>
                         <field name="CURRENCY_LIST">USD</field>
                         <field name="RESTARTONERROR">true</field>
-                        <field name="DURATION">5</field>
-                        <field name="DURATION_TYPE_LIST">t</field>
-                        <field name="AMOUNT">1</field>
                         <value name="DURATION">
                           <block type="math_number"><field name="NUM">5</field></block>
                         </value>
@@ -60,7 +57,6 @@
                         </value>
                         <statement name="PURCHASE">
                           <block type="controls_if" id="rsi_call_condition">
-                            <mutation elseif="0" else="0"></mutation>
                             <value name="IF0">
                               <block type="logic_compare">
                                 <field name="OP">LT</field>
@@ -82,7 +78,6 @@
                             </statement>
                             <next>
                               <block type="controls_if" id="rsi_put_condition">
-                                <mutation elseif="0" else="0"></mutation>
                                 <value name="IF0">
                                   <block type="logic_compare">
                                     <field name="OP">GT</field>
